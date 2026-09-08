@@ -1,4 +1,4 @@
-Metal Surface Wear Prediction
+## Metal Surface Wear Prediction
 
 基于东北大学钢材表面缺陷数据集的双阶段潜空间扩散模型
 
@@ -8,9 +8,8 @@ Metal Surface Wear Prediction
 
 注意： 当前实验使用的是从数据集中实际读取的 20 张图像，且没有真实的逐日磨损时间标签。因此，目前的实验结果更准确地描述为金属表面磨损演化生成/模拟，而不是经过真实时间序列数据验证的工业磨损寿命预测。
 
-⸻
 
-1. 项目简介
+## 项目简介
 
 金属表面在长期使用过程中会产生划痕、凹坑、粗糙度变化以及纹理退化等现象。传统的图像分类方法通常只能判断当前表面缺陷类别，而无法进一步模拟：
 
@@ -32,48 +31,47 @@ Day 10
 
 从而形成金属表面磨损的视觉演化过程。
 
-⸻
-
-2. 项目框架
+## 项目框架
 
 整体模型由四个主要部分组成：
 
-                Input Image
-                     │
-                     ▼
-              ┌─────────────┐
-              │ Autoencoder │
-              │    Encoder  │
-              └──────┬──────┘
-                     │
-                     ▼
-              Latent Representation
-                     │
-          ┌──────────┴──────────┐
-          │                     │
-          ▼                     ▼
-   Texture Condition       Noise Injection
-          │                     │
-          └──────────┬──────────┘
-                     ▼
-              Latent U-Net
-                     │
-                     ▼
-             Reverse Diffusion
-                     │
-                     ▼
-              Pass 1 Generation
-                     │
-                     ▼
-              Pass 2 Refinement
-                     │
-                     ▼
-               Decoder
-                     │
-                     ▼
-             Predicted Surface
+                      Input Image
+                           │
+                           ▼
+                    ┌─────────────┐
+                    │ Autoencoder │
+                    │    Encoder  │
+                    └──────┬──────┘
+                           │
+                           ▼
+                    Latent Representation
+                           │
+                ┌──────────┴──────────┐
+                │                     │
+                ▼                     ▼
+         Texture Condition       Noise Injection
+                │                     │
+                └──────────┬──────────┘
+                           ▼
+                    Latent U-Net
+                           │
+                           ▼
+                   Reverse Diffusion
+                           │
+                           ▼
+                    Pass 1 Generation
+                           │
+                           ▼
+                    Pass 2 Refinement
+                           │
+                           ▼
+                     Decoder
+                           │
+                           ▼
+                   Predicted Surface
 
-核心模块
+
+## 核心模块
 
 * Autoencoder：将 64×64 金属表面图像压缩到潜空间。
 * Latent U-Net：在潜空间中预测扩散噪声。
@@ -81,29 +79,12 @@ Day 10
 * Two-Pass Refinement：先进行较大幅度的变化，再使用低噪声进行细化。
 * Interpolation：将最终预测结果生成 Day 1–Day 10 的连续变化过程。
 
-⸻
+<img width="412" height="248" alt="image" src="https://github.com/user-attachments/assets/38b56142-b4eb-4cf4-8e51-a750fa0b546b" />
 
-3. 数据集
+## 数据集
 
 本项目使用东北大学钢材表面缺陷数据相关图像。
-
-数据读取目录：
-
-~/Downloads/Spot-Defect Images(SDI)
-
-程序会递归搜索以下格式：
-
-.bmp
-.png
-.jpg
-.jpeg
-.tif
-.tiff
-
-当前 Notebook 实际读取：
-
 Total metal images: 20
-
 图像统一转换为：
 64 × 64
 Grayscale
@@ -114,25 +95,8 @@ transform = transforms.Compose([
     transforms.Grayscale(num_output_channels=1),
     transforms.ToTensor()
 ]
-当前实验结果总结
 
-项目	当前结果
-输入尺寸	64 × 64
-图像通道	Grayscale
-实际读取图像	20
-Latent Size	4 × 16 × 16
-Diffusion Steps	200
-Autoencoder Epochs	30
-Diffusion Epochs	50
-Autoencoder Final Loss	0.0015
-LDM Loss (Epoch 10)	1.0027
-LDM Loss (Epoch 50)	0.9401
-LDM Loss下降	≈6.24%
-Prediction Horizon	10 Days
-
-⸻
-
-局限性
+## 局限性
 
 当前版本主要存在以下限制：数据量较小
 当前实验实际使用：
@@ -154,12 +118,12 @@ AdaNI 中：
 
 Day 1–Day 10 并不是模型分别预测的 10 个真实时间状态，
 进行图像空间插值得到。
-5. 当前模型不是严格意义上的 VAE
+当前模型不是严格意义上的 VAE
 虽然代码类名为：
 SimpleVAE
 但实际上没有 KL Loss 和概率潜变量建模。
 ⸻
-19. 后续改进方向
+## 后续改进方向
 为了将项目进一步发展成真正的金属表面磨损预测模型，下一步可以加入：
 Temporal Dataset
 构造：
@@ -174,7 +138,6 @@ Day 10 → Day 20
 Continuous Time Conditioning
 
 将：
-
 Day 1
 Day 2
 ...
@@ -212,8 +175,7 @@ LPIPS
 数据驱动 + 物理约束的金属磨损预测模型
 
 ⸻
-
-20. 项目定位
+## 项目定位
 
 本项目的核心思想可以概括为：
 
@@ -233,7 +195,7 @@ Two-Pass Refinement
 当前版本属于一个研究型 Prototype，后续通过加入真实时间序列磨损数据，可以进一步发展为真正具有定量预测能力的金属磨损预测系统。
 ⸻
 
-21. Reference
+## Reference
 
 本项目的方法设计参考了人脸衰老生成任务中的 Two-Pass Diffusion 思想，并针对金属表面纹理变化进行了调整。
 
@@ -247,7 +209,7 @@ Image Refinement
 
 ⸻
 
-License
+## License
 
 本项目仅用于学习、研究和实验目的。
 如果用于工业生产环境，需要进一步使用真实磨损时间序列数据进行训练、验证和可靠性评估。
